@@ -372,7 +372,7 @@ class Server:
 
             async def handler(req: types.CallToolRequest):
                 try:
-                    results = await func(req.params.name, (req.params.arguments or {}))
+                    results = await func(req)
                     return types.ServerResult(
                         types.CallToolResult(content=list(results), isError=False)
                     )
