@@ -439,6 +439,7 @@ class Server:
         read_stream: MemoryObjectReceiveStream[types.JSONRPCMessage | Exception],
         write_stream: MemoryObjectSendStream[types.JSONRPCMessage],
         initialization_options: InitializationOptions,
+        raw_request: Any | None = None,
         # When False, exceptions are returned as messages to the client.
         # When True, exceptions are raised, which will cause the server to shut down
         # but also make tracing exceptions much easier during testing and when using
@@ -459,6 +460,8 @@ class Server:
                             ) as responder
                         ):
                             with responder:
+                                if raw_request is not None:
+                                    req.headers = raw_request.headers
                                 await self._handle_request(
                                     message, req, session, raise_exceptions
                                 )

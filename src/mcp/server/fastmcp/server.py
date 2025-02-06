@@ -117,7 +117,7 @@ class FastMCP:
     def instructions(self) -> str | None:
         return self._mcp_server.instructions
 
-    def run(self, transport: Literal["stdio", "sse"] = "stdio") -> None:
+    def run(self, transport: Literal["stdio", "sse"] = "stdio", **kwargs) -> None:
         """Run the FastMCP server. Note this is a synchronous function.
 
         Args:
@@ -128,9 +128,9 @@ class FastMCP:
             raise ValueError(f"Unknown transport: {transport}")
 
         if transport == "stdio":
-            anyio.run(self.run_stdio_async)
+            anyio.run(self.run_stdio_async, **kwargs)
         else:  # transport == "sse"
-            anyio.run(self.run_sse_async)
+            anyio.run(self.run_sse_async, **kwargs)
 
     def _setup_handlers(self) -> None:
         """Set up core MCP protocol handlers."""
@@ -436,7 +436,7 @@ class FastMCP:
                 self._mcp_server.create_initialization_options(),
             )
 
-    async def run_sse_async(self) -> None:
+    async def run_sse_async(self, middleware: list[type] = []) -> None:
         """Run the server using SSE transport."""
         from starlette.applications import Starlette
         from starlette.routing import Mount, Route
@@ -451,6 +451,7 @@ class FastMCP:
                     streams[0],
                     streams[1],
                     self._mcp_server.create_initialization_options(),
+                    raw_request=request,
                 )
 
         starlette_app = Starlette(
@@ -460,6 +461,9 @@ class FastMCP:
                 Mount("/messages/", app=sse.handle_post_message),
             ],
         )
+
+        for m in middleware:
+                starlette_app.add_middleware(m)
 
         config = uvicorn.Config(
             starlette_app,
