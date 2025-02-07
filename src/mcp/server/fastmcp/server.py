@@ -463,7 +463,7 @@ class FastMCP:
         )
 
         for m in middleware:
-                starlette_app.add_middleware(m)
+            starlette_app.add_middleware(m)
 
         config = uvicorn.Config(
             starlette_app,
