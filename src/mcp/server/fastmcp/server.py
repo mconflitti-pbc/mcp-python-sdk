@@ -439,7 +439,7 @@ class FastMCP:
     async def _create_sse_app(self, middleware: list[type] = []):
         """Run the server using SSE transport."""
         from starlette.applications import Starlette
-        from starlette.routing import Mount, Route
+        from starlette.routing import Route
 
         sse = SseServerTransport("/messages/")
 
@@ -454,11 +454,14 @@ class FastMCP:
                     raw_request=request,
                 )
 
+        async def handle_post_message(request):
+            return sse.handle_post_message(request.scope, request.receive, request._send)
+
         starlette_app = Starlette(
             debug=self.settings.debug,
             routes=[
                 Route("/sse", endpoint=handle_sse),
-                Mount("/messages/", app=sse.handle_post_message),
+                Route("/messages/", app=handle_post_message),
             ],
         )
 
