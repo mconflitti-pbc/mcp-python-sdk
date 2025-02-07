@@ -436,7 +436,7 @@ class FastMCP:
                 self._mcp_server.create_initialization_options(),
             )
 
-    async def run_sse_async(self, middleware: list[type] = []) -> None:
+    async def _create_sse_app(self, middleware: list[type] = []):
         """Run the server using SSE transport."""
         from starlette.applications import Starlette
         from starlette.routing import Mount, Route
@@ -464,6 +464,12 @@ class FastMCP:
 
         for m in middleware:
             starlette_app.add_middleware(m)
+        
+        return starlette_app
+
+    async def run_sse_async(self, middleware: list[type] = []) -> None:
+        """Run the server using SSE transport."""
+        starlette_app = self._create_sse_app(middleware)
 
         config = uvicorn.Config(
             starlette_app,
