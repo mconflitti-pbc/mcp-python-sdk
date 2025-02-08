@@ -436,12 +436,12 @@ class FastMCP:
                 self._mcp_server.create_initialization_options(),
             )
 
-    async def _create_sse_app(self, middleware: list[type] = []):
+    async def _create_sse_app(self):
         """Run the server using SSE transport."""
         from starlette.applications import Starlette
         from starlette.routing import Route
 
-        sse = SseServerTransport("/messages/")
+        sse = SseServerTransport("messages/")
 
         async def handle_sse(request):
             async with sse.connect_sse(
@@ -464,15 +464,12 @@ class FastMCP:
                 Route("/messages/", endpoint=handle_post_message),
             ],
         )
-
-        for m in middleware:
-            starlette_app.add_middleware(m)
         
         return starlette_app
 
-    async def run_sse_async(self, middleware: list[type] = []) -> None:
+    async def run_sse_async(self) -> None:
         """Run the server using SSE transport."""
-        starlette_app = self._create_sse_app(middleware)
+        starlette_app = self._create_sse_app()
 
         config = uvicorn.Config(
             starlette_app,
