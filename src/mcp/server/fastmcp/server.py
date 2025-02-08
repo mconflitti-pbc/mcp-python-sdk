@@ -436,7 +436,7 @@ class FastMCP:
                 self._mcp_server.create_initialization_options(),
             )
 
-    async def _create_sse_app(self):
+    def _create_sse_app(self):
         """Run the server using SSE transport."""
         from starlette.applications import Starlette
         from starlette.routing import Route
@@ -455,7 +455,7 @@ class FastMCP:
                 )
 
         async def handle_post_message(request):
-            return sse.handle_post_message(request.scope, request.receive, request._send)
+            await sse.handle_post_message(request.scope, request.receive, request._send)
 
         starlette_app = Starlette(
             debug=self.settings.debug,
