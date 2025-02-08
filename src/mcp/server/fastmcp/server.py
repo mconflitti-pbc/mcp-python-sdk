@@ -441,7 +441,7 @@ class FastMCP:
         from starlette.applications import Starlette
         from starlette.routing import Route
 
-        sse = SseServerTransport("messages/")
+        sse = SseServerTransport("messages")
 
         async def handle_sse(request):
             async with sse.connect_sse(
@@ -461,7 +461,7 @@ class FastMCP:
             debug=self.settings.debug,
             routes=[
                 Route("/sse", endpoint=handle_sse),
-                Route("/messages/", endpoint=handle_post_message),
+                Route("/messages", endpoint=handle_post_message),
             ],
         )
         
