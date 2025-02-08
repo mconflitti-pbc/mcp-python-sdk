@@ -460,8 +460,8 @@ class FastMCP:
         starlette_app = Starlette(
             debug=self.settings.debug,
             routes=[
-                Route("/sse", endpoint=handle_sse),
-                Route("/messages", endpoint=handle_post_message),
+                Route("/sse", endpoint=handle_sse, methods=["GET"]),
+                Route("/messages", endpoint=handle_post_message, methods=["POST"]),
             ],
         )
         
